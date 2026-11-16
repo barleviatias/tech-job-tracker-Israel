@@ -81,6 +81,13 @@ DEFAULT_CONFIG = {
     ]
 }
 
+JOB_SKILL_TAGS = (
+    "material planning", "procurement", "inventory management", "bill of materials",
+    "erp", "sap", "supplier coordination", "production planning", "logistics",
+    "project management", "process improvement", "cross-functional coordination",
+    "excel", "power query", "power bi", "sql", "kpi reporting",
+)
+
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -520,6 +527,10 @@ def batch_verify_jobs_with_ai(jobs_batch):
         "Candidate Postings:\n"
         f"{''.join(items_text)}\n"
         "A job is APPROVED only if ALL FOUR criteria are strictly TRUE.\n\n"
+        "For each job, also extract skill_tags. Include only skills explicitly required or used in the role, "
+        f"using exact values from this list: {', '.join(JOB_SKILL_TAGS)}. "
+        "Return an empty list when the posting does not provide enough evidence. "
+        "Skill tags do not affect approval.\n\n"
         "Output strictly valid JSON with this exact structure:\n"
         "{\n"
         '  "evaluations": [\n'
@@ -532,6 +543,7 @@ def batch_verify_jobs_with_ai(jobs_batch):
         '      "approved": true/false,\n'
         f'      "experience_summary": "e.g. {min_yoe}-{max_yoe} YOE summary",\n'
         f'      "detected_city": "e.g. Tel Aviv / {TARGET_LOCATION}",\n'
+        '      "skill_tags": ["excel", "erp"],\n'
         '      "rejection_reason": "short explanation if rejected"\n'
         "    }\n"
         "  ]\n"
@@ -573,7 +585,8 @@ def export_to_excel(confirmed_jobs, unreached_companies, filepath):
         "מיקום",
         "קישור למשרה",
         "דרישות ניסיון",
-        "תאריך גילוי"
+        "תאריך גילוי",
+        "כישורים שזוהו"
     ])
 
     default_exp_label = f"{USER_CONFIG['min_yoe']}-{USER_CONFIG['max_yoe']} YOE (AI Verified)"
@@ -586,7 +599,8 @@ def export_to_excel(confirmed_jobs, unreached_companies, filepath):
             nj.get("location", TARGET_LOCATION),
             nj["url"],
             nj.get("experience", default_exp_label),
-            nj.get("discovered_at", datetime.now().strftime("%Y-%m-%d"))
+            nj.get("discovered_at", datetime.now().strftime("%Y-%m-%d")),
+            ", ".join(nj.get("skill_tags", []))
         ])
 
     if unreached_companies:
@@ -737,6 +751,7 @@ def main():
                         "location": location,
                         "url": job["url"],
                         "experience": exp_sum,
+                        "skill_tags": [tag for tag in ev.get("skill_tags", []) if tag in JOB_SKILL_TAGS] if isinstance(ev.get("skill_tags"), list) else [],
                         "discovered_at": datetime.now().isoformat()
                     }
                     confirmed_new_jobs.append(entry)

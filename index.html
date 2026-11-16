@@ -435,6 +435,24 @@
       line-height: 1.4;
     }
 
+    .fit-summary {
+      margin: -2px 0 14px;
+      padding: 9px 11px;
+      border-radius: 8px;
+      background: #F6F7FB;
+      color: var(--text-primary);
+      font-size: 0.81rem;
+      line-height: 1.5;
+    }
+
+    .fit-summary strong {
+      display: block;
+      font-size: 0.86rem;
+    }
+
+    .fit-summary[data-rank="3"] { background: #EAF8EE; }
+    .fit-summary[data-rank="2"] { background: #FFF7E8; }
+
     .job-meta {
       display: flex;
       flex-wrap: wrap;
@@ -702,7 +720,7 @@
         </div>
         <div>
           <div class="brand-title">תעשייה וניהול בישראל</div>
-          <div class="brand-subtitle">משרות ג׳וניור ובוגרים (0–2 שנות ניסיון)</div>
+          <div class="brand-subtitle">משרות לאביב · ג׳וניור ובוגרים (0–2 שנות ניסיון)</div>
         </div>
       </div>
 
@@ -812,6 +830,11 @@
           <option value="analytics">ניתוח עסקי ונתונים</option>
           <option value="process">שיפור תהליכים</option>
         </select>
+
+        <select id="sortFilter" class="filter-select" aria-label="מיון משרות">
+          <option value="fit">התאמה לאביב תחילה</option>
+          <option value="newest">החדשות תחילה</option>
+        </select>
       </div>
 
       <div class="tabs-row">
@@ -886,8 +909,10 @@
   <!-- Toast -->
   <div id="toast" class="toast"></div>
 
+  <script src="match_profile.js"></script>
   <script>
     let allJobs = [];
+    let avivProfile = null;
     let currentTab = 'new';
     let userStates = JSON.parse(localStorage.getItem('job_tracker_states') || '{}');
     let privateReferrals = JSON.parse(localStorage.getItem('job_tracker_referrals') || '{}');
@@ -896,6 +921,7 @@
     const searchInput = document.getElementById('searchInput');
     const referralFilter = document.getElementById('referralFilter');
     const roleFilter = document.getElementById('roleFilter');
+    const sortFilter = document.getElementById('sortFilter');
     const toast = document.getElementById('toast');
     const refreshBtn = document.getElementById('refreshBtn');
 
@@ -923,6 +949,8 @@
 
     async function fetchJobs() {
       try {
+        const profileResp = await fetch('aviv_profile.json?t=' + Date.now()).catch(() => null);
+        avivProfile = profileResp?.ok ? await profileResp.json() : null;
         const resp = await fetch('seen_jobs.json?t=' + Date.now());
         if (!resp.ok) throw new Error('Could not load seen_jobs.json');
         const data = await resp.json();
@@ -1003,6 +1031,9 @@
 
         return true;
       });
+      if (sortFilter.value === 'fit') {
+        filtered.sort((a, b) => (getJobMatch(b, avivProfile)?.rank || 0) - (getJobMatch(a, avivProfile)?.rank || 0));
+      }
 
       if (filtered.length === 0) {
         jobsGrid.innerHTML = `
@@ -1027,6 +1058,7 @@
         const contact = refInfo.contact;
         const refType = refInfo.type;
         const initial = (job.company || '?').trim().charAt(0);
+        const fit = getJobMatch(job, avivProfile);
 
         let pillClass = 'ref-direct';
         let pillText = 'הגשה ישירה';
@@ -1054,6 +1086,11 @@
               </div>
 
               <div class="job-title">${escapeHtml(job.title)}</div>
+
+              ${fit ? `<div class="fit-summary" data-rank="${fit.rank}">
+                <strong>התאמה לאביב: ${escapeHtml(fit.label)}</strong>
+                <span>${escapeHtml(fit.explanation)}</span>
+              </div>` : ''}
 
               <div class="job-meta">
                 <span class="meta-tag">
@@ -1192,6 +1229,7 @@
     searchInput.addEventListener('input', renderJobs);
     referralFilter.addEventListener('change', renderJobs);
     roleFilter.addEventListener('change', renderJobs);
+    sortFilter.addEventListener('change', renderJobs);
     refreshBtn.addEventListener('click', () => {
       fetchJobs();
       showToast('הנתונים רועננו');

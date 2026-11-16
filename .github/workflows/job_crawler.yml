@@ -33,7 +33,9 @@ jobs:
           pip install -r requirements.txt
 
       - name: Check role filters
-        run: python -m unittest discover -v
+        run: |
+          python -m unittest discover -v
+          node --test test_match_profile.js
 
       - name: Run Job Crawler
         env:
