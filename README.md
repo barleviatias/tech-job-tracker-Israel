@@ -1,90 +1,42 @@
-# Israeli Tech Junior Job Tracker
+# מעקב משרות תעשייה וניהול בישראל
 
-מנוע סריקה וסינון אוטונומי המנטר מעל **325 חברות הייטק וסטארטאפים בישראל**, ומאתר משרות פיתוח תוכנה, AI/ML, דאטה ו-Junior MLOps המיועדות ל-**0–2 שנות ניסיון** (כולל משרות סטודנט, בוגרים טריים וג'וניור — עם אפשרות התאמה אישית מלאה דרך `config.json`).
+גרסה מותאמת של [Israeli Tech Junior Job Tracker](https://github.com/amitshtark/tech-job-tracker-Israel) לחיפוש משרות התחלתיות בישראל לבוגרי תעשייה וניהול. הסורק מחפש תפקידי תפעול, שרשרת אספקה, לוגיסטיקה, רכש, תכנון, ניהול פרויקטים, PMO, שיפור תהליכים וניתוח עסקי/נתונים. ברירת המחדל היא **0–2 שנות ניסיון**, כולל בוגרים וג׳וניורים, ללא משרות סטודנט או התמחות.
 
-הפרויקט רץ באופן עצמאי בענן באמצעות **GitHub Actions** (4 פעמים ביום), מסנן רעשים (פוסל משרות מחוץ לישראל, דפי קטגוריות/חיפוש, תפקידי מכירות/תפעול ו-QA ידני), מציג את כל המשרות ב**לוח אינטרנטי אינטראקטיבי** (`index.html` ב-GitHub Pages) ומייצר גם קובץ אקסל יומי להורדה.
+הסריקה מתוזמנת בארבע ריצות יומיות באמצעות GitHub Actions. המשרות שאושרו מתווספות ל־`seen_jobs.json`, מוצגות ב־GitHub Pages ונכללות בקובץ Excel שנשמר כ־Artifact בכל ריצה. הסורק בודק כותרות תחילה, ואז שולח את תוכן המשרות המתאימות ל־Gemini לבדיקה של תפקיד, ניסיון, מיקום ודף משרה יחיד. סינון הכותרות אינו מושלם, ומשרות באתרי קריירה שדורשים JavaScript עשויות לא להימצא.
 
----
+## הפעלה ב־Fork
 
-## הפעלה מהירה למי שעושה Fork
+1. צור Fork לחשבון GitHub שלך. ב־Fork, הפעל את ה־Workflows בלשונית **Actions** אם GitHub מציג בקשה לכך.
+2. ב־**Settings → Secrets and variables → Actions** הוסף Repository secret בשם `GEMINI_API_KEY`, עם מפתח מ־[Google AI Studio](https://aistudio.google.com/). אין להכניס את המפתח לקובץ במאגר.
+3. ב־**Settings → Actions → General → Workflow permissions** בחר **Read and write permissions** כדי לאפשר לבוט לעדכן את `seen_jobs.json`.
+4. הפעל ידנית את **Israeli Industrial Engineering Job Crawler** דרך **Actions → Run workflow** ובדוק שהריצה הסתיימה בהצלחה. לאחר מכן הריצות המתוזמנות יופעלו אוטומטית; GitHub עשוי לעכב ריצות מתוזמנות.
+5. ב־**Settings → Pages** בחר פרסום מ־**Deploy from a branch**, הענף `main` והתיקייה `/ (root)`. הכתובת תהיה `https://<your-username>.github.io/<repository-name>/`.
 
-אם עשית **Fork** למאגר הזה וברצונך שהסריקה והאתר יעבדו אוטומטית בחשבון ה-GitHub שלך, בצע את 4 השלבים הבאים:
+ה־Workflow רץ ב־06:00, 10:00, 14:00 ו־18:00 UTC. השעות בישראל משתנות לפי שעון קיץ/חורף. קובץ ה־Excel זמין ב־**Actions → הריצה האחרונה → Artifacts → daily-jobs-excel**.
 
-### שלב 1: התאמת דרישות החיפוש שלך (`config.json`)
-אין צורך לגעת בקוד ה-Python. ניתן לערוך ישירות באתר של GitHub את הקובץ `config.json` (לחיצה על הקובץ -> אייקון העיפרון):
-* `min_yoe` / `max_yoe`: טווח שנות הניסיון הרצוי (ברירת מחדל: `0` עד `2`).
-* `location`: מיקום המשרה (ברירת מחדל: `"Israel"`).
-* `include_student_and_graduate`: האם לכלול משרות סטודנט ובוגרים טריים (`true` / `false`).
-* `target_roles`: רשימת תפקידי הפיתוח/טכנולוגיה שהסורק יאשר.
-* `excluded_roles`: רשימת תחומים שייפסלו מראש (כגון `"Manual QA"`, `"DevOps"`).
+## התאמת החיפוש
 
-### שלב 2: הגדרת הרשאות כתיבה לבוט (חובה)
-כדי שהבוט יוכל לעדכן אוטומטית את מאגר המשרות שנצפו (`seen_jobs.json`) לאחר כל ריצה:
-1. היכנס במאגר שלך ל-**Settings**.
-2. בתפריט השמאלי, בחר **Actions** -> **General**.
-3. גלול לסעיף **Workflow permissions**.
-4. סמן **Read and write permissions** ולחץ **Save**.
+אפשר לערוך את `config.json` ישירות ב־GitHub:
 
-### שלב 3: הגדרת מפתח Gemini API (חינמי)
-הסורק נעזר במודל Gemini (`gemini-flash-lite-latest`) כדי לקרוא את מלוא דרישות המשרה ולוודא התאמה לקריטריונים:
-1. צור מפתח API חינמי ב-[Google AI Studio](https://aistudio.google.com/).
-2. במאגר שלך ב-GitHub, היכנס ל-**Settings** -> **Secrets and variables** -> **Actions**.
-3. לחץ על **New repository secret**.
-4. תחת **Name** הזן: `GEMINI_API_KEY`.
-5. תחת **Secret** הדבק את המפתח ולחץ **Add secret**.
+- `min_yoe` ו־`max_yoe`: טווח שנות ניסיון.
+- `location`: מיקום היעד, כברירת מחדל `Israel`.
+- `include_student_and_graduate`: במצב `false` משרות סטודנט והתמחות נפסלות; משרות ג׳וניור ובוגרים עדיין מותרות.
+- `target_roles`: תחומי התפקיד שהמודל יאשר.
+- `candidate_title_patterns`: ביטויים רגולריים לכותרות באנגלית ובעברית שעוברות לסינון המעמיק. שינוי תחום חיפוש מחייב עדכון של רשימה זו לצד `target_roles`.
+- `excluded_roles`: תחומים לפסילה מוקדמת.
 
-### שלב 4: הפעלת ה-Actions ולוח המשרות (GitHub Pages)
-1. היכנס ללשונית **Actions** -> אם מופיע כפתור ירוק **I understand my workflows, go ahead and enable them**, לחץ עליו. להרצת בדיקה ראשונה: **Daily Israeli Tech Job Crawler** -> **Run workflow**.
-2. להפעלת האתר: היכנס ל-**Settings** -> **Pages**, בחר תחת **Branch** את **`main`** ותיקיית **`/ (root)`**, ולחץ **Save**.
-3. בתוך כדקה לוח המשרות יעלה לאוויר בכתובת:  
-   `https://<your-username>.github.io/tech-job-tracker-Israel/`
+`seen_jobs.json` מתחיל ריק בגרסה הזו, כך שמשרות הפיתוח שנאספו במקור לא יופיעו בלוח. הסימונים האישיים בלוח והרפרלים האישיים נשמרים רק בדפדפן (`localStorage`).
 
----
+## הרצה מקומית
 
-## שימוש בלוח המשרות, ברפרלים פרטיים ובדוחות
-
-* **לוח המשרות באתר (`index.html`):** טוען אוטומטית את `seen_jobs.json`, מאפשר חיפוש וסינון לפי תחום או סוג רפרל, ומאפשר לסמן משרות כ**"הגשתי"**, לשמור להמשך או להסיר משרות לא מתאימות (הסימונים נשמרים מקומית בדפדפן ב-`localStorage`).
-* **טעינת רפרלים אישיים (פרטי בדפדפן בלבד):** ניתן ללחוץ באתר על כפתור **"רפרלים אישיים"** ולטעון פעם אחת קובץ JSON מקומי מהמחשב בפורמט:
-  ```json
-  [
-    {
-      "name": "Company Name",
-      "referral_contact": "שם איש הקשר",
-      "referral_type": "איש קשר אישי"
-    }
-  ]
-  ```
-  המיפוי נשמר אך ורק ב-`localStorage` בדפדפן שלך ואינו עולה ל-GitHub, כך שתוכל לראות את שמות אנשי הקשר שלך על כל משרה מבלי לחשוף מידע פרטי במאגר ציבורי.
-* **קובץ אקסל יומי:** בסיום כל ריצה ב-**Actions**, ניתן להיכנס לריצה האחרונה ולהוריד מתחתית העמוד (תחת **Artifacts**) את הקובץ `daily-jobs-excel`.
-
----
-
-## הרצה מקומית (על המחשב שלך)
-
-1. שכפול המאגר והתקנת התלויות:
 ```bash
-git clone https://github.com/<your-username>/tech-job-tracker-Israel.git
-cd tech-job-tracker-Israel
+python3 -m venv .venv
+. .venv/bin/activate
 pip install -r requirements.txt
-```
-
-2. יצירת קובץ `.env` על בסיס `.env.example` עם מפתח ה-Gemini שלך:
-```env
-GEMINI_API_KEY="your-free-gemini-api-key"
-```
-
-3. התאמת `config.json` (במידת הצורך) והפעלת הסורק:
-```bash
+cp .env.example .env
+# הוסף GEMINI_API_KEY לקובץ .env
+python -m unittest discover -v
 python job_crawler.py
 ```
 
----
-
-## מבנה הקבצים המרכזיים
-* `config.json` — קובץ הגדרות הדרישות (שנות ניסיון, תפקידים, מיקום).
-* `job_crawler.py` — מנוע הסריקה המקבילי והסינון מול Gemini AI.
-* `index.html` — ממשק הווב האינטראקטיבי למעקב אחר משרות וטעינת רפרלים מקומית.
-* `seen_jobs.json` — מאגר המשרות שאותרו (מתעדכן אוטומטית על ידי הבוט).
-* `companies_registry_public.json` — רשימת החברות והקישורים לעמודי הקריירה.
-* `.env.example` — קובץ תבנית למשתני הסביבה להרצה מקומית.
-* `.github/workflows/job_crawler.yml` — הגדרת התזמון האוטומטי ב-GitHub Actions (4 פעמים ביום).
+קובץ `.env` מוחרג מ־Git. אין צורך להריץ את הסורק מקומית כדי להשתמש ב־Fork וב־GitHub Actions.

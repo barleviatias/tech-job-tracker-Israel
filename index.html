@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Job Tracker | משרות פיתוח ו-AI בישראל</title>
+  <title>Job Tracker | משרות תעשייה וניהול בישראל</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -701,8 +701,8 @@
           </div>
         </div>
         <div>
-          <div class="brand-title">Israel Tech Jobs</div>
-          <div class="brand-subtitle">מעקב משרות פיתוח, AI וסטודנטים (0–2 שנות ניסיון)</div>
+          <div class="brand-title">תעשייה וניהול בישראל</div>
+          <div class="brand-subtitle">משרות ג׳וניור ובוגרים (0–2 שנות ניסיון)</div>
         </div>
       </div>
 
@@ -805,11 +805,12 @@
 
         <select id="roleFilter" class="filter-select">
           <option value="all">כל התפקידים</option>
-          <option value="fullstack">Fullstack</option>
-          <option value="backend">Backend</option>
-          <option value="frontend">Frontend</option>
-          <option value="ai">AI / ML / Data</option>
-          <option value="student">סטודנט / מתמחה</option>
+          <option value="operations">תפעול</option>
+          <option value="supply">שרשרת אספקה ולוגיסטיקה</option>
+          <option value="planning">תכנון וייצור</option>
+          <option value="projects">ניהול פרויקטים / PMO</option>
+          <option value="analytics">ניתוח עסקי ונתונים</option>
+          <option value="process">שיפור תהליכים</option>
         </select>
       </div>
 
@@ -989,11 +990,15 @@
 
         if (role !== 'all') {
           const title = job.title.toLowerCase();
-          if (role === 'fullstack' && !title.includes('fullstack') && !title.includes('full-stack') && !title.includes('full stack')) return false;
-          if (role === 'backend' && !title.includes('backend') && !title.includes('back-end') && !title.includes('back end')) return false;
-          if (role === 'frontend' && !title.includes('frontend') && !title.includes('front-end') && !title.includes('react')) return false;
-          if (role === 'ai' && !title.includes('ai') && !title.includes('ml') && !title.includes('data') && !title.includes('learning')) return false;
-          if (role === 'student' && !title.includes('student') && !title.includes('intern') && !title.includes('סטודנט')) return false;
+          const categories = {
+            operations: /operations?|תפעול|industrial|תעשייה/,
+            supply: /supply chain|logistic|procurement|purchasing|buyer|שרשרת אספקה|לוגיסטיק|רכש|קניינ/,
+            planning: /plann|production|demand|תפ[י״']|פלנר|מתכננ|תכנון|ייצור/,
+            projects: /project|program coordinator|pmo|פרויקט/,
+            analytics: /analyst|analytics|business intelligence|\bbi\b|data|אנליסט|נתונים/,
+            process: /process|continuous improvement|תהליכ|מצוינות תפעולית/
+          };
+          if (!categories[role].test(title)) return false;
         }
 
         return true;

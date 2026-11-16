@@ -67,6 +67,7 @@ DEFAULT_CONFIG = {
         "MLOps",
         "Software Automation"
     ],
+    "candidate_title_patterns": [],
     "excluded_roles": [
         "Manual QA",
         "DevOps",
@@ -205,17 +206,27 @@ def build_reject_title_regex(cfg):
         patterns.extend([r"qa\b", r"manual tester", r"qc\b", r"quality assurance"])
     if "devops" in excluded_lower:
         patterns.extend([r"devops", r"sre\b", r"infrastructure engineer", r"sysadmin", r"system administrator"])
+    if "software development" in excluded_lower:
+        patterns.extend([r"software (?:engineer|developer)", r"frontend", r"backend", r"fullstack", r"full-stack", r"web developer"])
+    if not cfg.get("include_student_and_graduate", True):
+        patterns.extend([r"student", r"intern", r"internship", r"סטודנט", r"התמחות", r"מתמחה"])
 
     if max_yoe <= 2:
         patterns.extend([
             r"vp\b", r"director", r"chief", r"head of", r"lead\b",
-            r"principal", r"staff\b", r"architect", r"manager\b", r"senior", r"sr\b", r"expert"
+            r"principal", r"staff\b", r"architect", r"senior", r"sr\b", r"expert"
         ])
 
     return re.compile(r"\b(" + "|".join(patterns) + r")\b", re.IGNORECASE)
 
 
 def build_candidate_title_regex(cfg):
+    if cfg.get("candidate_title_patterns"):
+        return re.compile(
+            r"\b(?:" + "|".join(cfg["candidate_title_patterns"]) + r")\b",
+            re.IGNORECASE,
+        )
+
     base_keywords = [
         r"software", r"developer", r"engineer", r"fullstack", r"full-stack",
         r"backend", r"back-end", r"frontend", r"front-end",
@@ -468,7 +479,7 @@ def batch_verify_jobs_with_ai(jobs_batch):
     student_clause = (
         "including Junior, Graduate, Student Developer, Intern, or Entry Level roles"
         if include_students else
-        "excluding Student/Intern roles unless they meet the full-time YOE range"
+        "excluding all Student and Internship positions; full-time Junior and Graduate roles are allowed"
     )
 
     location_clause = (
@@ -492,7 +503,7 @@ def batch_verify_jobs_with_ai(jobs_batch):
         )
 
     prompt = (
-        "You are an expert technical hiring validator.\n"
+        "You are an expert Israeli job-posting validator.\n"
         "Carefully read the FULL text of each job posting below, paying close attention to the requirements section "
         "and location specifications, and evaluate each posting based on 4 mandatory criteria:\n\n"
         "1. Single Specific Job Vacancy (is_single_specific_job):\n"
@@ -539,10 +550,13 @@ def batch_verify_jobs_with_ai(jobs_batch):
         data = call_gemini_with_retries(payload, timeout=40)
         raw_text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
         parsed = json.loads(raw_text)
-        return parsed.get("evaluations", [])
+        evaluations = parsed.get("evaluations", [])
+        if len(evaluations) != len(jobs_batch) or {ev.get("job_index") for ev in evaluations} != set(range(1, len(jobs_batch) + 1)):
+            raise ValueError("Gemini returned an incomplete batch evaluation")
+        return evaluations
     except Exception as e:
         print(f"    [!] Error during batch AI verification: {e}")
-        return []
+        raise
 
 
 # --- Excel Generation ---
@@ -708,7 +722,10 @@ def main():
                 ev = eval_map.get(idx)
                 h = compute_job_hash(job["company"], job["title"], job["url"])
 
-                if ev and ev.get("approved"):
+                if ev and all(ev.get(field) is True for field in (
+                    "approved", "is_single_specific_job", "is_target_role",
+                    "is_matching_yoe", "is_matching_location"
+                )):
                     location = ev.get("detected_city") or TARGET_LOCATION
                     exp_sum = ev.get("experience_summary") or default_exp_label
 
@@ -731,7 +748,7 @@ def main():
                     print(f"  [X] REJECTED: {job['company']} - {job['title']} (Reason: {reason})")
 
             checkpoint["confirmed_jobs"] = confirmed_new_jobs
-            checkpoint["pending_candidates"] = []
+            checkpoint["pending_candidates"] = fetched_candidates[b_idx * batch_size:]
             save_json(CHECKPOINT_FILE, checkpoint)
             save_json(SEEN_JOBS_FILE, seen_jobs)
             export_to_excel(confirmed_new_jobs, failed_companies, OUTPUT_EXCEL)
@@ -756,3 +773,4 @@ if __name__ == "__main__":
     except Exception as exc:
         print(f"\n[!] Unexpected exit: {exc}")
         print("Progress checkpoint and Excel are preserved.")
+        sys.exit(1)
