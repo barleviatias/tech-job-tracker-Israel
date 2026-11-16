@@ -8,9 +8,8 @@
 
 1. צור Fork לחשבון GitHub שלך. ב־Fork, הפעל את ה־Workflows בלשונית **Actions** אם GitHub מציג בקשה לכך.
 2. ב־**Settings → Secrets and variables → Actions** הוסף Repository secret בשם `GEMINI_API_KEY`, עם מפתח מ־[Google AI Studio](https://aistudio.google.com/). אין להכניס את המפתח לקובץ במאגר.
-3. ב־**Settings → Actions → General → Workflow permissions** בחר **Read and write permissions** כדי לאפשר לבוט לעדכן את `seen_jobs.json`.
-4. הפעל ידנית את **Israeli Industrial Engineering Job Crawler** דרך **Actions → Run workflow** ובדוק שהריצה הסתיימה בהצלחה. לאחר מכן הריצות המתוזמנות יופעלו אוטומטית; GitHub עשוי לעכב ריצות מתוזמנות.
-5. ב־**Settings → Pages** בחר פרסום מ־**Deploy from a branch**, הענף `main` והתיקייה `/ (root)`. הכתובת תהיה `https://<your-username>.github.io/<repository-name>/`.
+3. הפעל ידנית את **Israeli Industrial Engineering Job Crawler** דרך **Actions → Run workflow** ובדוק שהריצה הסתיימה בהצלחה. לאחר מכן הריצות המתוזמנות יופעלו אוטומטית; GitHub עשוי לעכב ריצות מתוזמנות. ה־Workflow מבקש `contents: write` רק עבור עדכון `seen_jobs.json`, ולכן אין צורך להרחיב את הרשאות ברירת המחדל של כל ה־Workflows.
+4. ב־**Settings → Pages** בחר פרסום מ־**Deploy from a branch**, הענף `main` והתיקייה `/ (root)`. הכתובת תהיה `https://<your-username>.github.io/<repository-name>/`.
 
 ה־Workflow רץ ב־06:00, 10:00, 14:00 ו־18:00 UTC. השעות בישראל משתנות לפי שעון קיץ/חורף. קובץ ה־Excel זמין ב־**Actions → הריצה האחרונה → Artifacts → daily-jobs-excel**.
 

@@ -2,7 +2,7 @@ name: Israeli Industrial Engineering Job Crawler
 
 on:
   schedule:
-    # Runs 4 times a day (UTC 06:00, 10:00, 14:00, 18:00 -> Israel 08:00, 12:00, 16:00, 20:00)
+    # Runs 4 times a day in UTC; local Israel time varies with daylight saving.
     - cron: '0 6,10,14,18 * * *'
   workflow_dispatch:
 
