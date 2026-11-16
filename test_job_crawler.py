@@ -29,6 +29,14 @@ class CandidateTitleTests(unittest.TestCase):
             "Supply Chain Intern",
             "סטודנטית לתעשייה וניהול",
             "Senior Operations Manager",
+            "Junior Office & Operations Assistant",
+            "Finance Operations Associate",
+            "Trade Analyst – Operations",
+            "Duty Drawback Analyst – Operations",
+            "אחראי/ת תפעול ואדמיניסטרציה",
+            "מפעיל/ה בקו הייצור Corporate Operation",
+            "מלקט.ת למרלוג תפעול ולוגיסטיקה",
+            "נציג.ת לוגיסטיקה תפעול ולוגיסטיקה",
         ):
             with self.subTest(title=title):
                 self.assertFalse(is_title_candidate(title))

@@ -192,6 +192,9 @@ def build_reject_title_regex(cfg):
     patterns = [
         r"legal", r"counsel", r"office manager", r"administrative",
         r"receptionist", r"executive assistant", r"payroll", r"accounting",
+        r"office[\s&-]+operations[\s&-]+assistant", r"finance", r"financial",
+        r"trade analyst", r"duty drawback", r"production operator",
+        r"ו?אדמיניסטרציה", r"מעבדות", r"מפעיל", r"מלקט", r"נציג[.ת/]*[\s-]+לוגיסטיקה", r"פיננסי",
         r"מדריך", r"קורס", r"הכשרה", r"הכשרות", r"סדנה", r"טיפים", r"איך להצליח"
     ]
 
@@ -519,6 +522,10 @@ def batch_verify_jobs_with_ai(jobs_batch):
         "2. Target Role Match (is_target_role):\n"
         f"   - MUST match one of these target roles: {target_roles_str}.\n"
         f"   - STRICTLY REJECT these excluded roles: {excluded_roles_str}.\n\n"
+        "   - The actual work MUST involve professional analysis, planning, procurement, project coordination, "
+        "process improvement, business intelligence, or comparable industrial engineering skills. "
+        "Reject office administration, warehouse picking, production-line operation, lab-equipment operation, "
+        "finance or tax analysis, and generic logistics service roles even when a page says 'operations'.\n\n"
         f"3. Experience Level {min_yoe}-{max_yoe} YOE (is_matching_yoe):\n"
         f"   - MUST accept candidates within {min_yoe} to {max_yoe} years of experience ({student_clause}).\n"
         f"   - STRICTLY REJECT any posting whose minimum required experience is strictly greater than {max_yoe} years (e.g. '{max_yoe + 1}+ years').\n\n"
