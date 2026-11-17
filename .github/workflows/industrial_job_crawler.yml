@@ -2,8 +2,9 @@ name: Israeli Industrial Engineering Job Crawler
 
 on:
   schedule:
-    # Runs 4 times a day in UTC; local Israel time varies with daylight saving.
-    - cron: '0 6,10,14,18 * * *'
+    # Off the top of the hour to reduce dropped GitHub schedule events.
+    - cron: '17 8,12,16,20 * * *'
+      timezone: 'Asia/Jerusalem'
   workflow_dispatch:
 
 concurrency:
