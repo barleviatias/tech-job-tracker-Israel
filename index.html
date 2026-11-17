@@ -1007,7 +1007,7 @@
       const lastSuccess = document.getElementById('scanLastSuccess');
       const runLink = document.getElementById('scanRunLink');
       try {
-        const response = await fetch('https://api.github.com/repos/barleviatias/tech-job-tracker-Israel/actions/runs?per_page=30&t=' + Date.now());
+        const response = await fetch('https://api.github.com/repos/barleviatias/tech-job-tracker-Israel/actions/workflows/industrial_job_crawler.yml/runs?per_page=30&t=' + Date.now());
         if (!response.ok) throw new Error(`GitHub API: ${response.status}`);
         const data = await response.json();
         const runs = (data.workflow_runs || []).filter(run => run.path === '.github/workflows/industrial_job_crawler.yml');
