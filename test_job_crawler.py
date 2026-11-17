@@ -29,6 +29,8 @@ class CandidateTitleTests(unittest.TestCase):
             "Supply Chain Intern",
             "סטודנטית לתעשייה וניהול",
             "Senior Operations Manager",
+            "Supply Chain Manager (WM)",
+            "מנהל/ת פרויקטים בכיר/ה",
             "Junior Office & Operations Assistant",
             "Finance Operations Associate",
             "Trade Analyst – Operations",

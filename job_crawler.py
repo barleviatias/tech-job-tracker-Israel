@@ -224,7 +224,8 @@ def build_reject_title_regex(cfg):
     if max_yoe <= 2:
         patterns.extend([
             r"vp\b", r"director", r"chief", r"head of", r"lead\b",
-            r"principal", r"staff\b", r"architect", r"senior", r"sr\b", r"expert"
+            r"principal", r"staff\b", r"architect", r"senior", r"sr\b", r"expert",
+            r"בכיר(?:/ה|ה)?", r"supply chain manager"
         ])
 
     return re.compile(r"\b(" + "|".join(patterns) + r")\b", re.IGNORECASE)
