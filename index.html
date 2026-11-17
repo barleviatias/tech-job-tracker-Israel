@@ -123,6 +123,37 @@
       gap: 10px;
     }
 
+    .scan-status {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      margin-bottom: 20px;
+    }
+
+    .scan-status-main, .scan-status-details {
+      display: flex;
+      align-items: center;
+      gap: 8px 18px;
+      flex-wrap: wrap;
+    }
+
+    .scan-status-main { margin-bottom: 4px; }
+    .scan-status-details { color: var(--text-secondary); font-size: 0.85rem; }
+    .scan-status-details a { color: var(--ig-blue-hover); }
+
+    .scan-status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .scan-status.success .scan-status-dot { background: var(--status-green); }
+    .scan-status.failed .scan-status-dot { background: var(--status-red); }
+    .scan-status.running .scan-status-dot { background: #E59B19; }
+
     /* Stats Overview Bar */
     .stats-bar {
       display: grid;
@@ -746,6 +777,19 @@
 
   <main class="container">
 
+    <section id="scanStatus" class="scan-status" aria-live="polite">
+      <div class="scan-status-main">
+        <span class="scan-status-dot" aria-hidden="true"></span>
+        <strong id="scanState">בודק את מצב הסריקה...</strong>
+        <span id="scanLastRun"></span>
+      </div>
+      <div class="scan-status-details">
+        <span id="scanLastSuccess"></span>
+        <span id="lastJobAdded">בודק עדכון משרות...</span>
+        <a id="scanRunLink" href="https://github.com/barleviatias/tech-job-tracker-Israel/actions/workflows/industrial_job_crawler.yml" target="_blank" rel="noopener noreferrer">יומן הריצות ב־GitHub</a>
+      </div>
+    </section>
+
     <!-- Stats Cards -->
     <div class="stats-bar">
       <div class="stat-card stat-new active" data-tab="new">
@@ -947,6 +991,54 @@
       setTimeout(() => toast.classList.remove('show'), 2400);
     }
 
+    function formatIsraelDate(value) {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return 'זמן לא ידוע';
+      return new Intl.DateTimeFormat('he-IL', {
+        timeZone: 'Asia/Jerusalem', dateStyle: 'short', timeStyle: 'short', hour12: false
+      }).format(date);
+    }
+
+    async function fetchScanStatus() {
+      const panel = document.getElementById('scanStatus');
+      const state = document.getElementById('scanState');
+      const lastRun = document.getElementById('scanLastRun');
+      const lastSuccess = document.getElementById('scanLastSuccess');
+      const runLink = document.getElementById('scanRunLink');
+      try {
+        const response = await fetch('https://api.github.com/repos/barleviatias/tech-job-tracker-Israel/actions/runs?per_page=30&t=' + Date.now());
+        if (!response.ok) throw new Error(`GitHub API: ${response.status}`);
+        const data = await response.json();
+        const runs = (data.workflow_runs || []).filter(run => run.path === '.github/workflows/industrial_job_crawler.yml');
+        const latest = runs[0];
+        if (!latest) throw new Error('No crawler runs found');
+        const successful = runs.find(run => run.conclusion === 'success');
+        panel.classList.remove('success', 'failed', 'running');
+        if (latest.status !== 'completed') {
+          panel.classList.add('running');
+          state.textContent = latest.status === 'queued' ? 'הסריקה ממתינה ב־GitHub' : 'הסריקה פועלת כעת';
+        } else if (latest.conclusion === 'success') {
+          panel.classList.add('success');
+          state.textContent = 'הסריקה האחרונה הצליחה';
+        } else {
+          panel.classList.add('failed');
+          state.textContent = 'הסריקה האחרונה נכשלה';
+        }
+        lastRun.textContent = `הרצה אחרונה: ${formatIsraelDate(latest.status === 'completed' ? latest.updated_at : latest.created_at)}`;
+        lastSuccess.textContent = successful ? `סריקה מוצלחת אחרונה: ${formatIsraelDate(successful.updated_at)}` : 'עדיין לא הייתה סריקה מוצלחת';
+        runLink.href = `https://github.com/barleviatias/tech-job-tracker-Israel/actions/runs/${latest.id}`;
+        runLink.textContent = 'פרטי ההרצה ב־GitHub';
+      } catch (error) {
+        console.warn('Could not load crawler status:', error);
+        panel.classList.remove('success', 'failed', 'running');
+        state.textContent = 'לא ניתן לבדוק את מצב הסריקה כרגע';
+        lastRun.textContent = '';
+        lastSuccess.textContent = '';
+        runLink.href = 'https://github.com/barleviatias/tech-job-tracker-Israel/actions/workflows/industrial_job_crawler.yml';
+        runLink.textContent = 'יומן הריצות ב־GitHub';
+      }
+    }
+
     async function fetchJobs() {
       try {
         const profileResp = await fetch('aviv_profile.json?t=' + Date.now()).catch(() => null);
@@ -955,10 +1047,15 @@
         if (!resp.ok) throw new Error('Could not load seen_jobs.json');
         const data = await resp.json();
         allJobs = Array.isArray(data) ? data.slice().reverse() : [];
+        const latestJobDate = allJobs.map(job => job.discovered_at).filter(Boolean).sort().at(-1);
+        document.getElementById('lastJobAdded').textContent = latestJobDate
+          ? `משרה אחרונה נוספה: ${formatIsraelDate(latestJobDate.endsWith('Z') || latestJobDate.includes('+') ? latestJobDate : latestJobDate + 'Z')}`
+          : 'עדיין לא נוספו משרות';
         updateCounts();
         renderJobs();
       } catch (err) {
         console.warn('Could not load seen_jobs.json:', err);
+        document.getElementById('lastJobAdded').textContent = 'לא ניתן לבדוק מתי נוספו משרות';
         jobsGrid.innerHTML = `
           <div class="empty-state">
             <div class="empty-icon">
@@ -1232,6 +1329,7 @@
     sortFilter.addEventListener('change', renderJobs);
     refreshBtn.addEventListener('click', () => {
       fetchJobs();
+      fetchScanStatus();
       showToast('הנתונים רועננו');
     });
 
@@ -1324,6 +1422,7 @@
 
     updateReferralsUI();
     fetchJobs();
+    fetchScanStatus();
   </script>
 </body>
 </html>
