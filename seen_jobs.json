@@ -230,5 +230,128 @@
       "sql"
     ],
     "discovered_at": "2026-11-21T23:19:24.636917"
+  },
+  {
+    "company": "jifiti",
+    "title": "Operations",
+    "referral_contact": "הגשה ישירה באתר (ללא רפרל)",
+    "referral_type": "הגשה ישירה",
+    "location": "Modiin",
+    "url": "https://www.jifiti.com/jobs/co/operations/all",
+    "experience": "Junior-Mid level role indicating eligibility for 0-2 YOE candidates.",
+    "skill_tags": [
+      "project management"
+    ],
+    "discovered_at": "2026-11-26T01:48:30.397385"
+  },
+  {
+    "company": "Logica-it",
+    "title": "מנהל/ת פתרונות רכש ניהול פרויקטים גוש דן",
+    "referral_contact": "הגשה ישירה באתר (ללא רפרל)",
+    "referral_type": "הגשה ישירה",
+    "location": "גוש דן",
+    "url": "https://logica-it.com/jobs/21356/",
+    "experience": "Not specified",
+    "skill_tags": [
+      "procurement",
+      "project management"
+    ],
+    "discovered_at": "2026-11-26T01:48:36.047498"
+  },
+  {
+    "company": "Logica-it",
+    "title": "מנהל/ת פרויקטים טכנולוגיים ניהול פרויקטים ירושלים יו\"ש",
+    "referral_contact": "הגשה ישירה באתר (ללא רפרל)",
+    "referral_type": "הגשה ישירה",
+    "location": "ירושלים יו\"ש",
+    "url": "https://logica-it.com/jobs/21276/",
+    "experience": "Not specified",
+    "skill_tags": [
+      "project management"
+    ],
+    "discovered_at": "2026-11-26T01:48:36.047514"
+  },
+  {
+    "company": "Logica-it",
+    "title": "מנהל/ת פרויקטים ומנתח/ת מערכות ניהול פרויקטים גוש דן",
+    "referral_contact": "הגשה ישירה באתר (ללא רפרל)",
+    "referral_type": "הגשה ישירה",
+    "location": "Gush Dan / Israel",
+    "url": "https://logica-it.com/jobs/21273/",
+    "experience": "Junior to mid level",
+    "skill_tags": [
+      "project management"
+    ],
+    "discovered_at": "2026-11-26T01:48:38.863132"
+  },
+  {
+    "company": "Logica-it",
+    "title": "מנהל/ת פרויקטים דיגיטלים למשרד ממשלתי בירושלים ניהול פרויקטים ירושלים יו\"ש",
+    "referral_contact": "הגשה ישירה באתר (ללא רפרל)",
+    "referral_type": "הגשה ישירה",
+    "location": "Jerusalem / Israel",
+    "url": "https://logica-it.com/jobs/21254/",
+    "experience": "Junior to mid level",
+    "skill_tags": [
+      "project management"
+    ],
+    "discovered_at": "2026-11-26T01:48:38.863184"
+  },
+  {
+    "company": "Logica-it",
+    "title": "מיישם/ת SAP לוגיסטי/ת SAP השפלה",
+    "referral_contact": "הגשה ישירה באתר (ללא רפרל)",
+    "referral_type": "הגשה ישירה",
+    "location": "HaShfela / Israel",
+    "url": "https://logica-it.com/jobs/21012/",
+    "experience": "Junior to mid level",
+    "skill_tags": [
+      "sap",
+      "logistics"
+    ],
+    "discovered_at": "2026-11-26T01:48:38.863201"
+  },
+  {
+    "company": "Logica-it",
+    "title": "מנהל/ת פרויקטים בתחום תשתיות IT ניהול פרויקטים גוש דן",
+    "referral_contact": "הגשה ישירה באתר (ללא רפרל)",
+    "referral_type": "הגשה ישירה",
+    "location": "Gush Dan / Israel",
+    "url": "https://logica-it.com/jobs/20456/",
+    "experience": "Junior to mid level",
+    "skill_tags": [
+      "project management"
+    ],
+    "discovered_at": "2026-11-26T01:48:38.863208"
+  },
+  {
+    "company": "Logica-it",
+    "title": "OT infrastructures Project Manager תשתיות גוש דן",
+    "referral_contact": "הגשה ישירה באתר (ללא רפרל)",
+    "referral_type": "הגשה ישירה",
+    "location": "Gush Dan / Israel",
+    "url": "https://logica-it.com/jobs/20412/",
+    "experience": "Junior to mid level",
+    "skill_tags": [
+      "project management"
+    ],
+    "discovered_at": "2026-11-26T01:48:38.863215"
+  },
+  {
+    "company": "TSG IT Advanced Systems",
+    "title": "Corporate & Administration #2129 מתאם/ת לוגיסטיקה ורכש מרכז 5 ימים בשבוע More Details",
+    "referral_contact": "הגשה ישירה באתר (ללא רפרל)",
+    "referral_type": "הגשה ישירה",
+    "location": "Or Yehuda, Israel",
+    "url": "https://www.tsg.tech/careers/job-2129/",
+    "experience": "No minimum experience specified; training provided, accepting 0-2 YOE",
+    "skill_tags": [
+      "excel",
+      "sap",
+      "supplier coordination",
+      "logistics",
+      "procurement"
+    ],
+    "discovered_at": "2026-11-26T01:48:58.079914"
   }
 ]
